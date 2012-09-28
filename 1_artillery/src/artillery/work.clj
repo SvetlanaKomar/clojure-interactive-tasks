@@ -14,12 +14,18 @@
 ;;; Here is an example of such function.
 ;;; It always returns PI / 2 (missile is launched straight up).
 ;;; You can either calculate answer or find it by trying and adjusting different angles.
+
+
+
 (defn plane-static-solution []
-  (* 0.5 Math/PI))
+  (/ (* 105.6783 Math/PI)
+      180))
+  ;;; NOTE Angle is calculated using formulae in plane-dinamic-solution1
+
 
 ;;; Here's a function that will show you animation with plane you launching missiles.
 ;;; You need to pass your solution (function name) to this function and run this file.
-(plane-static plane-static-solution)
+;     (plane-static plane-static-solution)
 
 
 
@@ -29,16 +35,45 @@
 ;;; You need to write a function that takes 4 numbers - your coordinates (player) and plane's coordinates (target).
 ;;; Function should calculate angle to launch missile at.
 
+
+
 ;;; Example
 ;;; pl-x, pl-y - player's (your) coordinates.
 ;;; trg-x trg-y - target's coordinates.
 ;;; Run and see how it launches missile now and then fix it to hit the plane.
+
+;;;;;;;;Pre-solution
 (defn plane-dynamic-solution [pl-x pl-y trg-x trg-y]
-  (Math/atan2 (- trg-y pl-y) (- trg-x pl-x)))
+  ( let [ dx (- trg-x pl-x)
+	  dy (- trg-y pl-y)
+	  ddx (* dx dx)
+	  ddy (* dy dy)
+	  D ( Math/sqrt (+ ddx (* 3 (+ ddx ddy))))
+	  t (/ (+ dx D) 15)
+	  x (+ 0.5 (/ dx (* 10 t)))]
+    ( Math/acos x))	)
+
+
+
+
+;;;;;;;;;;;More generalised function. See definitions for vtrg, vm below
+(def vtrg 5)
+(def vm 10)
+(defn plane-dynamic-solution1 [pl-x pl-y trg-x trg-y]
+  ( let [ dx (- trg-x pl-x)
+	  dy (- trg-y pl-y)
+	  ddx (* dx dx)
+	  ddy (* dy dy)
+	  ddxy (+ ddx ddy)
+	  ddv (- (* vm vm) (* vtrg vtrg))
+	  D ( Math/sqrt (+ (* ddx (* vtrg vtrg))  (* ddxy ddv) ))
+	  t (/ (+ (* dx vtrg)  D) ddv)
+	  x (+ (/ vtrg vm) (/ dx (* vm t)))]
+    ( Math/acos x))	)
 
 ;;; To run program uncomment - remove ';' symbol before '(plane-dynamic ...)'
 ;;; And also comment previous task - add ';' symbol before '(plane-static ...)'
-; (plane-dynamic plane-dynamic-solution)
+; (plane-dynamic plane-dynamic-solution1)
 
 
 
@@ -55,14 +90,74 @@
 ;;; Now you don't have template function, so write one yourself.
 ;;; Hint: try to pass random angle at first e.g. 0.5 and see how it works.
 ;;; To run program uncomment it (and comment others) and pass your function to it.
-; (ufo-static YOUR_SOLUTION)
+
+(defn UFO-static-solution []
+	(Math/atan 2.7746)
+		)
+	;;; NOTE Angle is calculated using formulae in UFO-dinamic-solution2
+(defn UFO-static-solution1 []
+	(Math/atan 1.2254)
+		)
+	;;; NOTE Angle is calculated using formulae in UFO-dinamic-solution1
+;(ufo-static UFO-static-solution)
 
 
 
 ;;; Same UFO, but now it appears at random position (same as plane-dynamic).
 ;;; Your position is also changing.
 ;;; You need to write function that takes 4 arguments: your position (x, y)  and UFO's position (x, y).
-; (ufo-dynamic YOUR_SOLUTION)
+
+;;;;;;;Pre-solution
+(defn UFO-dinamic-solution [pl-x pl-y trg-x trg-y]
+  ( let [ dx (- trg-x pl-x)
+	  dy (- trg-y pl-y)
+	  ddx (* dx dx)
+	  p1 (* 0.0005 ddx)
+	  p2 (+ p1 dy)
+	  p3 (* 0.002 p2)
+	  D (- 1 p3)
+	  q (* 0.001 dx)]
+	( if (< D 0) (* 0.5 Math/PI)
+	     (if (= dx 0) (* 0.5 Math/PI)
+	 	 (if (> dx 0) ( Math/atan (/ (- 1 (Math/sqrt D)) q))
+		     (+ (Math/atan (/ (- 1 (Math/sqrt D)) q))
+			Math/PI) )))))
+
+
+;;;;;;;;;;More generalised function. See definitions for g below
+(def g 0.1)
+(defn UFO-dinamic-solution1 [pl-x pl-y trg-x trg-y]
+  ( let [ dx (- trg-x pl-x)
+	  dy (- trg-y pl-y)
+	  ddx (* dx dx)
+	  k (/ g (* 2 (* vm vm)))
+	  k1 (+ (* k ddx) dy)
+	  l (* 4 (* k k1))
+	  D (- 1 l)
+	  q (/ (* g dx) (* vm vm))]
+	( if (< D 0) (* 0.5 Math/PI)
+	     (if (= dx 0) (* 0.5 Math/PI)
+	 	 (if (> dx 0) ( Math/atan (/ (- 1 (Math/sqrt D)) q))
+		     (+ (Math/atan (/ (- 1 (Math/sqrt D)) q))
+			Math/PI) )))))
+
+(defn UFO-dinamic-solution2 [pl-x pl-y trg-x trg-y]
+  ( let [ dx (- trg-x pl-x)
+	  dy (- trg-y pl-y)
+	  ddx (* dx dx)
+	  k (/ g (* 2 (* vm vm)))
+	  k1 (+ (* k ddx) dy)
+	  l (* 4 (* k k1))
+	  D (- 1 l)
+	  q (/ (* g dx) (* vm vm))]
+	( if (< D 0) (* 0.5 Math/PI)
+	     (if (= dx 0) (* 0.5 Math/PI)
+	 	 (if (> dx 0) ( Math/atan (/ (+ 1 (Math/sqrt D)) q))
+		     (+ (Math/atan (/ (+ 1 (Math/sqrt D)) q))
+			Math/PI) )))))
+
+
+ (ufo-dynamic UFO-dinamic-solution2)
 
 
 

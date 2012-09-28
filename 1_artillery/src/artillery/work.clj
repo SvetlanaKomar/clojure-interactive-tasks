@@ -124,7 +124,7 @@
 			Math/PI) )))))
 
 
-;;;;;;;;;;More generalised function. See definitions for g below
+;;;;;;;;;;More generalised functions. Two types of angles. See definition for g below
 (def g 0.1)
 (defn UFO-dinamic-solution1 [pl-x pl-y trg-x trg-y]
   ( let [ dx (- trg-x pl-x)
